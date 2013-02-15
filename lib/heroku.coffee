@@ -2,6 +2,8 @@ https = require("https")
 rest  = require("restler")
 url   = require("url")
 
+https.globalAgent.maxSockets = 5000
+
 class Heroku
 
   constructor: (@key) ->
@@ -11,18 +13,17 @@ class Heroku
       cb = query
       query = {}
     options =
+      hostname: "api.heroku.com"
+      port: 443
+      path: path
       query: query
-      username: "none"
-      password: @key
+      auth: ":#{@key}"
       headers:
-        "User-Agent": "airbag/0.1"
-    rest.get("https://api.heroku.com#{path}", options).on "complete", (data) ->
-      if data instanceof Error
-        cb data
-      else if data and data.error
-        cb data.error
-      else
-        cb null, data
+        "User-Agent": "app-state/0.1"
+    https.get options, (res) ->
+      buffer = ""
+      res.on "data", (data) -> buffer += data
+      res.on "end",         -> cb null, JSON.parse(buffer)
 
 exports.init = (key) ->
   new Heroku(key)
