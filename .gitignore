@@ -1,0 +1,5 @@
+.anvil
+.env
+build
+log
+public/*.css
