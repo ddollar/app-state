@@ -3,7 +3,7 @@ coffee  = require("coffee-script")
 express = require("express")
 heroku  = require("./lib/heroku")
 http    = require("http")
-log     = require("./lib/logger").init("swarm.server")
+log     = require("./lib/logger").init("app-state")
 
 http.globalAgent.maxSockets = 1000
 
@@ -20,7 +20,7 @@ app.disable "x-powered-by"
 
 app.use express.logger
   buffer: false
-  format: "ns=\"swarm\" measure=\"http.:method\" source=\":url\" status=\":status\" elapsed=\":response-time\" from=\":remote-addr\" agent=\":user-agent\""
+  format: "ns=\"app-state\" measure=\"http.:method\" source=\":url\" status=\":status\" elapsed=\":response-time\" from=\":remote-addr\" agent=\":user-agent\""
 app.use express.cookieParser()
 app.use express.bodyParser()
 app.use express.basicAuth (user, pass, cb) -> cb(null, pass)
