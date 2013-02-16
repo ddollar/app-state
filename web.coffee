@@ -38,7 +38,6 @@ app.get "/apps/all/state", (req, res) ->
       (cb) ->
         log.start "ps", app:app.name, (logger) ->
           api.get "/apps/#{app.name}/ps", (err, dynos) ->
-            logger.success()
             async.parallel
               app_name: (cb) -> cb(null, app.namee)
               state: (cb) ->
@@ -54,7 +53,7 @@ app.get "/apps/all/state", (req, res) ->
                 transitions = (dynos.map (dyno) -> dyno.transitioned_at).sort()
                 cb null, transitions[transitions.length-1]
               (err, app) ->
-                logger.success()
+                if err then logger.error(err) else logger.success()
                 cb err, app),
     (err, state) ->
       return res.send(err, 403) if err
