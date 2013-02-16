@@ -39,7 +39,7 @@ app.get "/apps/all/state", (req, res) ->
         log.start "ps", app:app.name, (logger) ->
           api.get "/apps/#{app.name}/ps", (err, dynos) ->
             async.parallel
-              app_name: (cb) -> cb(null, app.namee)
+              app_name: (cb) -> cb(null, app.name)
               state: (cb) ->
                 return cb(null, "sleeping") unless dynos
                 return cb(null, "sleeping") if dynos.length is 0
