@@ -1,6 +1,6 @@
-https = require("https")
-rest  = require("restler")
-url   = require("url")
+coffee = require("coffee-script")
+https  = require("https")
+url    = require("url")
 
 https.globalAgent.maxSockets = 5000
 
@@ -8,19 +8,18 @@ class Heroku
 
   constructor: (@key) ->
 
-  get: (path, query={}, cb) ->
-    if query instanceof Function
-      cb = query
-      query = {}
-    options =
+  get: (path, options={}, cb) ->
+    if options instanceof Function
+      cb = options
+      options = {}
+    get =
       hostname: "api.heroku.com"
       port: 443
       path: path
-      query: query
+      query: options.query || {}
       auth: ":#{@key}"
-      headers:
-        "User-Agent": "app-state/0.1"
-    https.get options, (res) ->
+      headers: coffee.helpers.merge("User-Agent":"app-state/0.1", (options.headers || {}))
+    https.get get, (res) ->
       buffer = ""
       res.on "data", (data) -> buffer += data
       res.on "end",         -> cb null, JSON.parse(buffer)

@@ -31,13 +31,16 @@ app.get "/", (req, res) ->
   res.send "ok"
 
 app.get "/apps/all/state", (req, res) ->
+  headers = switch req.headers["x-heroku-sudo"]
+    when "true" then { "X-Heroku-Sudo":"true", "X-Heroku-Sudo-User":req.headers["x-heroku-sudo-user"] }
+    else {}
   api = heroku.init(req.user)
-  api.get "/apps", (err, apps) ->
+  api.get "/apps", headers:headers, (err, apps) ->
     return res.send(err, 403) if err
     async.parallel (apps.map (app) ->
       (cb) ->
         log.start "ps", app:app.name, (logger) ->
-          api.get "/apps/#{app.name}/ps", (err, dynos) ->
+          api.get "/apps/#{app.name}/ps", headers:headers, (err, dynos) ->
             async.parallel
               app_name: (cb) -> cb(null, app.name)
               state: (cb) ->
